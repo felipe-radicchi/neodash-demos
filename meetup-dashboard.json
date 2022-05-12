@@ -1,0 +1,141 @@
+{
+  "title": "Meetup Dash",
+  "version": "2.1",
+  "settings": {
+    "pagenumber": 1,
+    "editable": true,
+    "fullscreenEnabled": true
+  },
+  "pages": [
+    {
+      "title": "Main Page",
+      "reports": [
+        {
+          "title": "",
+          "query": "CALL db.labels() YIELD label\nCALL apoc.cypher.run('MATCH (:`'+label+'`) RETURN count(*) as count',{}) YIELD value\nRETURN label, value.count",
+          "width": 5,
+          "height": 2,
+          "x": 0,
+          "y": 0,
+          "type": "pie",
+          "selection": {
+            "index": "label",
+            "value": "value.count",
+            "key": "(none)"
+          },
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "Treemap",
+          "query": "MATCH path=(n:Tag{name:\"html\"})-[:SIMILAR*1..3]->(x)\nWITH  nodes(path) as no\nWITH no, last(no) as leaf\nWITH  [n IN no[..-1] | n.name] AS result, sum(leaf.count) as val\nUNWIND result as res\nRETURN collect(DISTINCT res) as result, val\n",
+          "width": 7,
+          "height": 2,
+          "x": 5,
+          "y": 0,
+          "type": "circlePacking",
+          "selection": {
+            "index": "result",
+            "value": "val",
+            "key": "(none)"
+          },
+          "settings": {
+            "nodePositions": {},
+            "interactive": false
+          }
+        },
+        {
+          "title": "Top 100 users",
+          "query": "MATCH (u:User)\nRETURN u.name as Name, u.reputation as Rep\nORDER BY Rep DESC\nLIMIT 100",
+          "width": 3,
+          "height": 2,
+          "x": 0,
+          "y": 2,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "",
+          "query": "MATCH path=(u:User)--(:Post)-->(:Post)<--(u2:User)\nWHERE u.name = \"max54\"\nRETURN path\n\n\n",
+          "width": 6,
+          "height": 2,
+          "x": 3,
+          "y": 2,
+          "type": "graph",
+          "selection": {
+            "User": "name",
+            "Post": "title",
+            "Question": "title",
+            "Answer": "id"
+          },
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "",
+          "query": "CALL db.relationshipTypes() YIELD relationshipType as type\nCALL apoc.cypher.run('MATCH ()-[:`'+type+'`]->() RETURN count(*) as count',{}) YIELD value\nRETURN type, value.count\n\n\n",
+          "width": 3,
+          "height": 2,
+          "x": 9,
+          "y": 2,
+          "type": "bar",
+          "selection": {
+            "index": "type",
+            "value": "value.count",
+            "key": "(none)"
+          },
+          "settings": {
+            "nodePositions": {},
+            "valueScale": "linear"
+          }
+        },
+        {
+          "title": "",
+          "query": "CALL db.schema.visualization()\n\n\n",
+          "width": 3,
+          "height": 2,
+          "x": 0,
+          "y": 4,
+          "type": "graph",
+          "selection": {
+            "Answer": "name",
+            "User": "name",
+            "Post": "name",
+            "Question": "name",
+            "Tag": "name"
+          },
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "",
+          "query": "MATCH path=(q:Post)--(a:Post)--()\nWHERE q.id = \"129178\"\nRETURN path",
+          "width": 3,
+          "height": 2,
+          "x": 3,
+          "y": 4,
+          "type": "graph",
+          "selection": {
+            "Post": "title",
+            "Question": "title",
+            "User": "name",
+            "Answer": "id"
+          },
+          "settings": {
+            "nodePositions": {}
+          }
+        }
+      ]
+    },
+    {
+      "title": "Second Page",
+      "reports": []
+    }
+  ]
+}
